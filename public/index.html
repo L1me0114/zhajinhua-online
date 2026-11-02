@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07150f">
+  <meta name="description" content="2-8 人实时联机炸金花，打开即玩。">
+  <title>炸金花 · 联机版</title>
+  <link rel="stylesheet" href="/styles.css?v=points-2">
+</head>
+<body>
+<div class="ambient" aria-hidden="true">
+  <span class="glow glow-a"></span>
+  <span class="glow glow-b"></span>
+  <span class="grain"></span>
+</div>
+
+<!-- ============================ 大厅 ============================ -->
+<section id="landing" class="screen landing">
+  <header class="landing-top">
+    <div class="brand">
+      <span class="brand-mark">♠</span>
+      <span class="brand-text">炸金花<small>ZHA JIN HUA</small></span>
+    </div>
+    <div class="landing-top-actions">
+      <button id="remote-btn" class="ghost-btn desktop-only" type="button">远程联机</button>
+      <button id="mobile-join-btn" class="ghost-btn desktop-only" type="button">手机加入</button>
+      <button id="rules-btn" class="ghost-btn" type="button">玩法规则</button>
+    </div>
+  </header>
+
+  <main class="landing-main">
+    <div class="hero">
+      <p class="eyebrow"><span></span> MULTIPLAYER · 2–8 PLAYERS</p>
+      <h1>炸<span>金</span>花</h1>
+      <p class="hero-sub">一副牌，一桌人。<br>闷到底，还是看一眼？</p>
+      <ul class="hero-points">
+        <li><b>2–8</b><span>人实时联机</span></li>
+        <li><b>×2</b><span>看牌注额翻倍</span></li>
+        <li><b>0 分起</b><span>可负分 · 每局自动结算</span></li>
+      </ul>
+      <div class="hero-cards" aria-hidden="true">
+        <div class="deco-card red"><span>A</span><i>♥</i></div>
+        <div class="deco-card"><span>K</span><i>♠</i></div>
+        <div class="deco-card red"><span>Q</span><i>♦</i></div>
+      </div>
+      <p class="hero-note">“牌桌上没有兄弟，只有底池。”</p>
+    </div>
+
+    <div class="lobby-card">
+      <button id="resume-room" class="resume-room hidden" type="button">
+        <span>继续上次房间</span><b id="resume-code">----</b><i>→</i>
+      </button>
+      <div class="lobby-tabs" role="tablist">
+        <button type="button" data-tab="create" class="active">创建房间</button>
+        <button type="button" data-tab="join">加入房间</button>
+      </div>
+
+      <div class="lobby-pane" data-pane="create">
+        <label class="field">
+          <span>你的昵称</span>
+          <input id="create-name" maxlength="12" placeholder="例如：阿杰" autocomplete="nickname">
+        </label>
+
+        <div class="field-grid">
+          <label class="field">
+            <span>底注</span>
+            <select id="set-ante">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>单注封顶</span>
+            <select id="set-max">
+              <option value="100">100</option>
+              <option value="200" selected>200</option>
+              <option value="500">500</option>
+              <option value="1000">1,000</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>回合时限</span>
+            <select id="set-time">
+              <option value="20">20 秒</option>
+              <option value="30" selected>30 秒</option>
+              <option value="45">45 秒</option>
+              <option value="60">60 秒</option>
+            </select>
+          </label>
+        </div>
+
+        <p class="score-rule"><b>每人 0 分起</b> · 可负分 · 每局结束自动结算本局净分</p>
+
+        <label class="switch-row">
+          <span>235 吃豹子<small>地方玩法：不同花的 2-3-5 可击败豹子</small></span>
+          <input type="checkbox" id="set-235">
+          <i class="switch" aria-hidden="true"></i>
+        </label>
+        <label class="switch-row">
+          <span>公开房间<small>让陌生人也看到，默认关闭更安全</small></span>
+          <input type="checkbox" id="set-listed">
+          <i class="switch" aria-hidden="true"></i>
+        </label>
+
+        <button id="create-btn" class="primary-btn" type="button">
+          <span>创建房间</span><b>→</b>
+        </button>
+        <p class="fine-print">创建后把房间号发给朋友，最多 8 人同桌；每人从 0 分开始，每局结束会停一下看结算。</p>
+      </div>
+
+      <div class="lobby-pane hidden" data-pane="join">
+        <label class="field">
+          <span>你的昵称</span>
+          <input id="join-name" maxlength="12" placeholder="例如：小花" autocomplete="nickname">
+        </label>
+        <label class="field">
+          <span>房间号</span>
+          <input id="join-code" maxlength="6" placeholder="输入 6 位房间号" class="code-input" autocomplete="off" spellcheck="false">
+        </label>
+        <button id="join-btn" class="primary-btn" type="button">
+          <span>加入房间</span><b>→</b>
+        </button>
+        <p class="fine-print" id="join-hint">没有房间号？切到左边创建一个。</p>
+      </div>
+
+      <div class="room-list-wrap">
+        <div class="room-list-head">
+          <span><i class="live-dot"></i> 公开房间</span>
+          <button id="refresh-rooms" class="text-btn" type="button">刷新</button>
+        </div>
+        <div id="room-list" class="room-list">
+          <p class="empty">正在找桌子…</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="landing-foot">
+    <span>标准炸金花规则 · 无需注册 · 打开即玩</span>
+    <span class="foot-suits">♠ ♥ ♦ ♣</span>
+  </footer>
+</section>
+
+<!-- ============================ 牌桌 ============================ -->
+<section id="room" class="screen room-screen hidden">
+  <header class="room-top">
+    <div class="room-brand">
+      <span class="brand-mark small">♠</span>
+      <span>炸金花</span>
+    </div>
+    <button id="room-code-btn" class="room-code" type="button" title="复制邀请链接">
+      <span>房间</span><b id="room-code">----</b><i>⧉</i>
+    </button>
+    <div class="room-top-actions">
+      <span id="conn-status" class="conn-dot" title="连接状态"></span>
+      <button id="settle-room" class="top-text-btn desktop-only" type="button">结算</button>
+      <button id="remote-room" class="top-text-btn desktop-only" type="button">远程联机</button>
+      <button id="mobile-join-room" class="top-text-btn desktop-only" type="button">手机加入</button>
+      <button id="side-toggle" class="icon-btn mobile-only" type="button" title="战况与聊天">☰<span id="feed-badge"></span></button>
+      <button id="rules-btn-room" class="icon-btn" type="button" title="玩法规则">?</button>
+      <button id="sound-btn" class="icon-btn" type="button" title="音效开关">♪</button>
+      <button id="settings-btn" class="icon-btn" type="button" title="房间设置">⚙</button>
+      <button id="leave-btn" class="icon-btn danger" type="button" title="离开房间">⏻</button>
+    </div>
+  </header>
+
+  <main class="room-main">
+    <div class="play-area">
+      <div class="table-stage">
+        <div class="table-rim"></div>
+        <div class="table-felt" id="table-felt">
+          <div class="felt-watermark" aria-hidden="true">炸金花</div>
+          <div id="seats" class="seats"></div>
+
+          <div id="table-center" class="table-center">
+            <div class="pot-box">
+              <span class="pot-label">底池</span>
+              <strong id="pot-value">0</strong>
+            </div>
+            <div class="table-meta">
+              <span id="stake-pill" class="pill">单注 —</span>
+              <span id="hand-pill" class="pill">等待开局</span>
+            </div>
+            <div id="turn-box" class="turn-box"></div>
+            <div id="result-box" class="result-box hidden"></div>
+          </div>
+
+          <div class="deck-stack" id="deck-stack" aria-hidden="true"><i></i><i></i><i></i></div>
+        </div>
+      </div>
+
+      <div id="my-zone" class="my-zone">
+        <div class="my-cards" id="my-cards"></div>
+        <div class="my-meta">
+          <div class="my-name-row">
+            <span id="my-name">你</span>
+            <span id="my-badge" class="mini-badge hidden">房主</span>
+          </div>
+          <div class="my-score-row">
+            <span class="score-icon">分</span>
+            <span id="my-score">0</span>
+          </div>
+          <span id="my-hand-label" class="hand-label">等待开局</span>
+        </div>
+      </div>
+
+      <div id="action-bar" class="action-bar">
+        <div class="waiting-pill"><span class="spinner"></span> 等待开局…</div>
+      </div>
+      <p id="action-hint" class="action-hint"></p>
+    </div>
+
+    <aside id="side-panel" class="side-panel">
+      <div class="side-head">
+        <div class="side-tabs">
+          <button type="button" data-side-tab="feed" class="active">战况</button>
+          <button type="button" data-side-tab="rank">排行</button>
+        </div>
+        <button id="close-side" class="icon-btn mobile-only" type="button">×</button>
+      </div>
+      <div id="side-feed" class="side-pane side-feed">
+        <div id="feed-list" class="feed-list"></div>
+        <div class="chat-bar">
+          <div id="quick-chats" class="quick-chats"></div>
+          <form id="chat-form" autocomplete="off">
+            <input id="chat-input" maxlength="80" placeholder="说点什么…" autocomplete="off">
+            <button type="submit" class="send-btn">发送</button>
+          </form>
+        </div>
+      </div>
+      <div id="side-rank" class="side-pane side-rank hidden">
+        <div class="rank-head">
+          <span>本次积分</span>
+          <button id="settle-btn" class="mini-action" type="button">结算算分</button>
+        </div>
+        <div id="rank-list" class="rank-list"></div>
+        <p class="rank-note">每人 0 分起，可负分；每局结算净分，结束时负数按分数付给正数。</p>
+      </div>
+    </aside>
+    <div id="side-backdrop" class="side-backdrop"></div>
+  </main>
+</section>
+
+<div id="toasts" class="toasts" aria-live="polite"></div>
+<div id="boot-loading" class="boot-loading hidden">
+  <div class="spinner"></div>
+  <p>正在进入房间…</p>
+</div>
+<div id="confetti" class="confetti" aria-hidden="true"></div>
+<div id="modal-root"></div>
+
+<script type="module" src="/app.js?v=points-2"></script>
+</body>
+</html>
