@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: zhajinhua
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install --omit=dev --no-audit --no-fund
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
