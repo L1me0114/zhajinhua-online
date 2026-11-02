@@ -1,0 +1,15 @@
+{
+  "name": "zhajinhua-online",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "2-8 人联机炸金花，零依赖 Node.js 服务端",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node test/cards.test.js && node test/engine.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
